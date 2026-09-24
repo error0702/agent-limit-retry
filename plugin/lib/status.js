@@ -21,7 +21,7 @@ export function status() {
   } else {
     lines.push("  还没有额度数据：运行 alr init 接上状态栏，再打开一次 Claude Code。");
   }
-  const hits = recentLimitHits(8, 3);
+  const hits = recentLimitHits(8, 20).filter((h) => !h.transcript.includes("alr-selftest")).slice(0, 3);
   if (hits.length) {
     lines.push("  最近撞限额：");
     for (const h of hits) lines.push(`    ${fmt(h.at)}  ${LABEL[h.kind] || h.kind}限额，${fmt(h.resetsAt)} 重置`);
@@ -31,10 +31,13 @@ export function status() {
   if (cx) {
     for (const [name, w] of [["主窗口", cx.primary], ["副窗口", cx.secondary]]) {
       if (!w) continue;
-      const span = w.windowMinutes >= 1440 ? `${Math.round(w.windowMinutes / 1440)} 天` : `${Math.round(w.windowMinutes / 60)} 小时`;
-      lines.push(`  ${span.padEnd(6)} ${bar(w.usedPercent)} ${Math.round(w.usedPercent)}%  ${fmt(w.resetsAt)} 重置`);
+      // Codex writes snake_case; older alr snapshots were camelCase
+      const mins = w.window_minutes ?? w.windowMinutes, pct = w.used_percent ?? w.usedPercent, at = w.resets_at ?? w.resetsAt;
+      if (typeof pct !== "number") continue;
+      const span = mins >= 1440 ? `${Math.round(mins / 1440)} 天` : `${Math.round(mins / 60)} 小时`;
+      lines.push(`  ${span.padEnd(6)} ${bar(pct)} ${Math.round(pct)}%  ${fmt(at)} 重置`);
     }
-    lines.push(`  （套餐 ${cx.plan || "?"}，数据来自 ${ago(cx.at)}的会话日志）`);
+    lines.push(`  （套餐 ${cx.plan_type || cx.plan || "?"}，数据来自 ${ago(cx.at)}的会话日志）`);
   } else {
     lines.push("  没找到 Codex 会话日志。");
   }
