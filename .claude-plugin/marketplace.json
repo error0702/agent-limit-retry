@@ -1,0 +1,17 @@
+{
+  "name": "agent-limit-retry",
+  "owner": {
+    "name": "agent-limit-retry"
+  },
+  "plugins": [
+    {
+      "name": "agent-limit-retry",
+      "source": "./plugin",
+      "description": "Hand off before a usage limit hits, and pick up again after it resets.",
+      "version": "0.4.0"
+    }
+  ],
+  "metadata": {
+    "description": "Keep AI coding agents working through usage limits."
+  }
+}

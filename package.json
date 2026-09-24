@@ -1,0 +1,32 @@
+{
+  "name": "@autorun/agent-limit-retry",
+  "version": "0.4.0",
+  "description": "Keep AI coding agents working through usage limits: hand off before the limit, resume after the reset.",
+  "type": "module",
+  "bin": {
+    "alr": "bin/alr.js",
+    "agent-limit-retry": "bin/alr.js"
+  },
+  "files": [
+    "bin",
+    "plugin",
+    ".claude-plugin",
+    "docs",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/error0702/agent-limit-retry"
+  },
+  "homepage": "https://retry.autorun.fun"
+}
