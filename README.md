@@ -15,23 +15,7 @@ alr selftest                      # simulated limit hit + resume against a local
 alr status                        # your 5-hour / 7-day windows, reset times, recent limit hits
 ```
 
-```
-$ alr selftest
-Self-test: simulating "5-hour window exhausted, resets in 10 s" (local fake API, no quota spent)…
-  ✓ Claude Code starts
-  ✓ plugin hooks load
-  ✓ limit hit detected, reset time read: 13:56:31
-  ✓ same session resumed on time, task finished (20 s)
-  ✓ status line tapped (usage percentages visible before the limit)
-All good.
-
-$ alr status
-Claude Code
-  5-hour   █░░░░░░░░░ 12%  resets 9/24 13:50
-  weekly   ███████░░░ 69%  resets 9/29 10:00
-  (from the status line, updated 4 h ago; at 90% the agent is asked to write a handoff first)
-```
-
+![alr selftest and alr status](docs/assets/alr.png)
 Restart Claude Code after installing. Everything runs locally: no proxy, no account, no telemetry, no update ping.
 
 ## Why

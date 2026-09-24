@@ -7,10 +7,11 @@ import { findTranscript, lastLimitHit, parseResetText } from "./claude.js";
 import { RESUME_PROMPT } from "./handoff.js";
 import { notify } from "./notify.js";
 import { loadPro } from "./pro-loader.js";
+import { t, zh } from "./i18n.js";
 
 const LIMIT_TEXT = /hit your .*limit|usage limit|reached your .*limit/i;
 const now = () => Math.floor(Date.now() / 1000);
-const fmt = (t) => new Date(t * 1000).toLocaleString("zh-CN", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
+const fmt = (at) => new Date(at * 1000).toLocaleString(zh ? "zh-CN" : "en-US", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 function runClaude(args, log) {
   const bin = process.env.ALR_CLAUDE_BIN || "claude";
@@ -18,7 +19,7 @@ function runClaude(args, log) {
     const child = spawn(bin, args, { stdio: ["ignore", "pipe", "inherit"] });
     let out = "";
     child.stdout.on("data", (d) => { out += d; });
-    child.on("error", (e) => { log(`无法启动 ${bin}: ${e.message}`); resolve({ code: 127, result: null }); });
+    child.on("error", (e) => { log(t(`Cannot start ${bin}: ${e.message}`, `无法启动 ${bin}: ${e.message}`)); resolve({ code: 127, result: null }); });
     child.on("close", (code) => {
       // --output-format json prints one JSON object; take the last parseable line.
       let result = null;
@@ -60,7 +61,7 @@ async function sleepUntil(t, onTick) {
 export async function run({ prompt, extraArgs = [], maxResumes, cwd = process.cwd(), log = console.error, quiet = false, agent = "claude" }) {
   if (agent === "codex") {
     const pro = await loadPro();
-    if (!pro) { log("Codex 的无人值守续跑属于 Pro 版：https://retry.autorun.fun"); return 2; }
+    if (!pro) { log(t("Unattended Codex resume is part of Pro: https://retry.autorun.fun", "Codex 的无人值守续跑属于 Pro 版：https://retry.autorun.fun")); return 2; }
     return pro.codexrun.run({ prompt, extraArgs, maxResumes, cwd, log, quiet });
   }
   const cfg = config();
@@ -84,21 +85,21 @@ export async function run({ prompt, extraArgs = [], maxResumes, cwd = process.cw
       return res.code ?? 1;
     }
     if (attempt >= maxResumes) {
-      log(`[agent-limit-retry] 已续跑 ${attempt} 次仍然撞限额，停止。会话 ${sessionId}`);
+      log(t(`[agent-limit-retry] Still hitting the limit after ${attempt} resumes; giving up. Session ${sessionId}`, `[agent-limit-retry] 已续跑 ${attempt} 次仍然撞限额，停止。会话 ${sessionId}`));
       return 3;
     }
     lastCutAt = now();
     const resetsAt = hit.resetsAt || now() + 5 * 3600;     // unknown reset: assume a 5-hour window
     const wakeAt = resetsAt + delay;
     appendEvent({ type: "run_waiting", session: sessionId, cwd, kind: hit.kind, resetsAt, wakeAt });
-    log(`[agent-limit-retry] 额度用完（${hit.kind}），会话 ${sessionId} 将在 ${fmt(wakeAt)} 自动续跑。` +
-        "保持这个进程运行（可以放在 tmux / nohup 里）。");
-    if (cfg.notify) notify("agent-limit-retry：任务暂停", `额度用完，${fmt(wakeAt)} 自动续跑`);
+    log(t(`[agent-limit-retry] Usage limit hit (${hit.kind}); session ${sessionId} resumes automatically at ${fmt(wakeAt)}. `, `[agent-limit-retry] 额度用完（${hit.kind}），会话 ${sessionId} 将在 ${fmt(wakeAt)} 自动续跑。`) +
+        t("Keep this process running (tmux / nohup is fine).", "保持这个进程运行（可以放在 tmux / nohup 里）。"));
+    if (cfg.notify) notify(t("agent-limit-retry: task paused", "agent-limit-retry：任务暂停"), t(`Usage limit hit; resumes at ${fmt(wakeAt)}`, `额度用完，${fmt(wakeAt)} 自动续跑`));
     let lastMsg = 0;
     await sleepUntil(wakeAt, (left) => {
-      if (now() - lastMsg >= 1800) { lastMsg = now(); log(`[agent-limit-retry] 还要等 ${Math.ceil(left / 60)} 分钟`); }
+      if (now() - lastMsg >= 1800) { lastMsg = now(); log(t(`[agent-limit-retry] ${Math.ceil(left / 60)} more minutes to wait`, `[agent-limit-retry] 还要等 ${Math.ceil(left / 60)} 分钟`)); }
     });
-    log(`[agent-limit-retry] 额度已重置，续跑会话 ${sessionId}（第 ${attempt + 1} 次）`);
+    log(t(`[agent-limit-retry] Quota reset; resuming session ${sessionId} (attempt ${attempt + 1})`, `[agent-limit-retry] 额度已重置，续跑会话 ${sessionId}（第 ${attempt + 1} 次）`));
   }
 }
 

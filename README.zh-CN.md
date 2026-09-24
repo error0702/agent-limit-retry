@@ -10,6 +10,8 @@ alr selftest                      # 本地假接口模拟一次撞限额 + 自�
 alr status                        # 5 小时 / 每周窗口、重置时间、最近撞限额记录
 ```
 
+![alr selftest and alr status](docs/assets/alr.png)
+
 装完重启一次 Claude Code。全部在本机运行：不走代理、不需要账号、没有遥测、不检查更新。
 
 ## 为什么

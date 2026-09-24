@@ -12,6 +12,7 @@ import { spawnSync } from "node:child_process";
 import { claudeDir, config, file, readJSON } from "./paths.js";
 import { findTranscript, recentLimitHits } from "./claude.js";
 import { loadPro } from "./pro-loader.js";
+import { t } from "./i18n.js";
 
 const hash = (s) => (s ? crypto.createHash("sha1").update(String(s)).digest("hex").slice(0, 8) : null);
 const ts = (d) => (d?.timestamp ? Math.floor(Date.parse(d.timestamp) / 1000) : null);
@@ -56,7 +57,8 @@ function timeline(transcript, from, to) {
       const a = d.attachment || {};
       const ours = JSON.stringify(a).includes("agent-limit-retry");
       if (!ours && !a.hookEvent) continue;
-      e.hook = { event: a.hookEvent || null, ours, agents: ours ? (JSON.stringify(a).match(/有 (\d+) 个子 Agent/) || [])[1] || null : null };
+      const m = ours ? JSON.stringify(a).match(/有 (\d+) 个子 Agent|(\d+) subagent\(s\) were cut off/) : null;
+      e.hook = { event: a.hookEvent || null, ours, agents: m ? m[1] || m[2] : null };
     }
     out.push(e);
   }
@@ -123,7 +125,8 @@ export async function report(outDir) {
   }
   const settings = readJSON(path.join(claudeDir(), "settings.json"), {});
   const data = {
-    about: "agent-limit-retry 测试反馈。只有时间、事件类型、工具名、子 Agent ID/状态；不含对话内容、代码、文件内容。项目路径和任务描述已做哈希。",
+    about: t("agent-limit-retry feedback. Contains only timestamps, event types, tool names and subagent IDs/status; no conversation content, code or file contents. Project paths and task descriptions are hashed.",
+      "agent-limit-retry 测试反馈。只有时间、事件类型、工具名、子 Agent ID/状态；不含对话内容、代码、文件内容。项目路径和任务描述已做哈希。"),
     createdAt: Math.floor(Date.now() / 1000),
     versions: {
       alr: pkg.version, claude: (spawnSync("claude", ["--version"], { encoding: "utf8" }).stdout || "").trim(),
@@ -141,8 +144,10 @@ export async function report(outDir) {
   const out = path.join(dir, `alr-report-${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "")}.json`);
   fs.writeFileSync(out, JSON.stringify(data, null, 1));
   const subs = sessions.reduce((n, s) => n + s.subagents.length, 0);
-  console.log(`反馈文件：${out}
+  console.log(t(`Feedback file: ${out}
+  Contains ${sessions.length} sessions that hit a limit, the status of ${subs} subagents, and ${events.length} plugin events.
+  No conversation content or code; feel free to open it before sending. Just send this file to the author.`, `反馈文件：${out}
   包含 ${sessions.length} 个撞过额度的会话、${subs} 个子 Agent 的状态、${events.length} 条插件事件。
-  不含对话内容和代码，发之前可以打开看一眼。把这个文件发给作者就行。`);
+  不含对话内容和代码，发之前可以打开看一眼。把这个文件发给作者就行。`));
   return 0;
 }

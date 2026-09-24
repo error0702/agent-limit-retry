@@ -9,6 +9,7 @@
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { t, zh } from "../lib/i18n.js";
 
 const lib = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../lib");
 const { config, appendEvent } = await import(path.join(lib, "paths.js"));
@@ -45,7 +46,7 @@ function stop(ev) {
   if (h.handoffWritten(ev.cwd, st.requestedAt)) {
     h.saveSessionState(ev.session_id, { ...st, handoffDone: now() });
     appendEvent({ type: "handoff_written", session: ev.session_id, cwd: ev.cwd });
-    if (config().notify) notify("交接文件已写好", `${path.basename(ev.cwd || "")}：额度快用完了，进度已保存到 ${path.basename(h.handoffPath(ev.cwd))}`);
+    if (config().notify) notify(t("Handoff file written", "交接文件已写好"), t(`${path.basename(ev.cwd || "")}: quota nearly used up; progress saved to ${path.basename(h.handoffPath(ev.cwd))}`, `${path.basename(ev.cwd || "")}：额度快用完了，进度已保存到 ${path.basename(h.handoffPath(ev.cwd))}`));
     return;
   }
   out({ decision: "block", reason: h.STOP_REMINDER(ev.cwd) });
@@ -61,9 +62,9 @@ function stopFailure(ev) {
   h.saveSessionState(ev.session_id, { ...st, limitHitAt: now(), resetsAt: hit?.resetsAt, resumeNoted: false, cwd: ev.cwd });
   appendEvent({ type: "limit_hit", session: ev.session_id, cwd: ev.cwd, kind: hit?.kind, resetsAt: hit?.resetsAt });
   if (config().notify) {
-    const when = hit?.resetsAt ? new Date(hit.resetsAt * 1000).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }) : "未知时间";
-    const done = h.handoffWritten(ev.cwd, now() - 6 * 3600) ? "交接文件已写好" : "没有交接文件";
-    notify("Claude Code 额度用完了", `${path.basename(ev.cwd || "")}：${when} 重置，${done}`);
+    const when = hit?.resetsAt ? new Date(hit.resetsAt * 1000).toLocaleTimeString(zh ? "zh-CN" : "en-US", { hour: "2-digit", minute: "2-digit" }) : t("unknown time", "未知时间");
+    const done = h.handoffWritten(ev.cwd, now() - 6 * 3600) ? t("handoff file written", "交接文件已写好") : t("no handoff file", "没有交接文件");
+    notify(t("Claude Code hit its usage limit", "Claude Code 额度用完了"), t(`${path.basename(ev.cwd || "")}: resets ${when}, ${done}`, `${path.basename(ev.cwd || "")}：${when} 重置，${done}`));
   }
 }
 

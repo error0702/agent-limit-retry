@@ -1,8 +1,27 @@
 #!/usr/bin/env node
 // agent-limit-retry CLI. Run with no arguments: installs if needed, otherwise shows status.
 const load = (m) => import(new URL(`../plugin/lib/${m}`, import.meta.url));
+const { t } = await load("i18n.js");
 
-const HELP = `agent-limit-retry：让 Claude Code / Codex / ZCode 扛过额度限制
+const HELP = t(`agent-limit-retry: keep Claude Code / Codex / ZCode working through usage limits
+
+  npx agent-limit-retry     one-command install (shows quota when already installed)
+
+  alr selftest                       Claude Code: simulate a limit hit and the auto-resume to confirm it works (spends no quota)
+  alr zcode-check                    ZCode: confirm this machine's ZCode data can be read
+  alr codex-check                    Codex: confirm the plugin is installed, hooks are trusted and quota can be read
+  alr status                         Claude Code / Codex quota and recent limit hits
+  alr run "<task>" [--agent codex] [-- <args>]
+                                     unattended run: on a limit hit, wait for the reset and resume (weekly limits too; Codex supported)
+  alr report                         after a limit hit, build a feedback file (no conversation or code) to send to the author
+  alr uninstall                      uninstall and restore your original status line
+
+Settings: ~/.agent-limit-retry/config.json
+  threshold 90   quota % at which the agent is asked to write a handoff file first
+  handoffFile    handoff file name, default HANDOFF.md (project root)
+  maxResumes 5   how many times alr run may resume
+  notify true    desktop notification on limit hits and when the handoff file is written`,
+`agent-limit-retry：让 Claude Code / Codex / ZCode 扛过额度限制
 
   npx agent-limit-retry     一条命令装好（已装好时显示额度）
 
@@ -19,7 +38,7 @@ const HELP = `agent-limit-retry：让 Claude Code / Codex / ZCode 扛过额度�
   threshold 90   额度用到多少 % 时让 Agent 先写交接文件
   handoffFile    交接文件名，默认 HANDOFF.md（项目根目录）
   maxResumes 5   alr run 最多续跑几次
-  notify true    撞限额、写好交接文件时发桌面通知`;
+  notify true    撞限额、写好交接文件时发桌面通知`);
 
 const argv = process.argv.slice(2);
 const yes = argv.includes("--yes") || argv.includes("-y");
@@ -48,7 +67,7 @@ switch (cmd) {
     const agent = opt("--agent") || "claude";
     const skip = new Set(["--max-resumes", "--agent"].flatMap((n) => { const i = own.indexOf(n); return i === -1 ? [] : [i, i + 1]; }));
     const prompt = own.filter((a, i) => !skip.has(i))[0];
-    if (!prompt) { console.error('用法：alr run "<任务>" [--agent claude|codex] [--max-resumes N] [-- <传给 claude/codex 的参数>]'); code = 2; break; }
+    if (!prompt) { console.error(t('Usage: alr run "<task>" [--agent claude|codex] [--max-resumes N] [-- <args passed to claude/codex>]', '用法：alr run "<任务>" [--agent claude|codex] [--max-resumes N] [-- <传给 claude/codex 的参数>]')); code = 2; break; }
     code = await (await load("run.js")).run({ prompt, extraArgs, maxResumes, agent });
     break;
   }

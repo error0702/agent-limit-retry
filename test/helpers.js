@@ -8,7 +8,7 @@ export const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname)
 /** Fresh ALR_HOME + CLAUDE_CONFIG_DIR + project dir for one test. */
 export function sandbox() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "relay-test-"));
-  const env = { ...process.env, ALR_HOME: path.join(dir, "relay"), CLAUDE_CONFIG_DIR: path.join(dir, "claude"), CODEX_HOME: path.join(dir, "codex"), ALR_NO_WATCH: "1" };
+  const env = { ...process.env, ALR_HOME: path.join(dir, "relay"), CLAUDE_CONFIG_DIR: path.join(dir, "claude"), CODEX_HOME: path.join(dir, "codex"), ALR_NO_WATCH: "1", ALR_LANG: "zh" };
   const project = path.join(dir, "project");
   fs.mkdirSync(project, { recursive: true });
   fs.mkdirSync(env.ALR_HOME, { recursive: true });
