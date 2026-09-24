@@ -16,6 +16,7 @@ alr status                        # your 5-hour / 7-day windows, reset times, re
 ```
 
 ![alr selftest and alr status](docs/assets/alr.png)
+
 Restart Claude Code after installing. Everything runs locally: no proxy, no account, no telemetry, no update ping.
 
 ## Why
