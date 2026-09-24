@@ -2,7 +2,7 @@
 
 **Keep Claude Code working through usage limits.** Know the exact reset time, hand off before the limit hits, and run headless jobs that sleep through the reset and resume themselves.
 
-[![npm](https://img.shields.io/npm/v/@autorun/agent-limit-retry?color=2f7d5a)](https://www.npmjs.com/package/@autorun/agent-limit-retry)
+[![npm](https://img.shields.io/npm/v/agent-limit-retry?color=2f7d5a)](https://www.npmjs.com/package/agent-limit-retry)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 ![node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 [![Pro](https://img.shields.io/badge/Pro-subagent%20resume-1f3b5c)](https://retry.autorun.fun)
@@ -10,7 +10,7 @@
 [中文说明](README.zh-CN.md)
 
 ```bash
-npx @autorun/agent-limit-retry    # one question, then the plugin is installed and the status line is tapped
+npx agent-limit-retry    # one question, then the plugin is installed and the status line is tapped
 alr selftest                      # simulated limit hit + resume against a local fake API; no quota spent
 alr status                        # your 5-hour / 7-day windows, reset times, recent limit hits
 ```

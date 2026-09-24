@@ -5,7 +5,7 @@
 [English](README.md) · Pro 版：<https://retry.autorun.fun>
 
 ```bash
-npx @autorun/agent-limit-retry    # 回答一个问题，装好插件并接上状态栏
+npx agent-limit-retry    # 回答一个问题，装好插件并接上状态栏
 alr selftest                      # 本地假接口模拟一次撞限额 + 自动续跑，不花额度
 alr status                        # 5 小时 / 每周窗口、重置时间、最近撞限额记录
 ```

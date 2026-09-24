@@ -4,7 +4,7 @@ const load = (m) => import(new URL(`../plugin/lib/${m}`, import.meta.url));
 
 const HELP = `agent-limit-retry：让 Claude Code / Codex / ZCode 扛过额度限制
 
-  npx @autorun/agent-limit-retry     一条命令装好（已装好时显示额度）
+  npx agent-limit-retry     一条命令装好（已装好时显示额度）
 
   alr selftest                       Claude Code：模拟一次撞限额和自动续跑，确认能用（不花额度）
   alr zcode-check                    ZCode：确认能读到本机的 ZCode 数据
