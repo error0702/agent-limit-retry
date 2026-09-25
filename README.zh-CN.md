@@ -82,6 +82,7 @@ alr run "把测试迁移到 vitest" -- --permission-mode acceptEdits
 
 ## 更新记录
 
+- **0.4.3** — `alr run` / `alr selftest` 失败时会打印 Claude Code 的原话（比如"未登录"），不再只给一个退出码；自检说明只覆盖 Claude Code。
 - **0.4.2** — Windows：`alr selftest` / `alr report` 拼出的路径是 `/C:/...`，自检启动不了带插件的 Claude Code；`alr run` / `alr init` 现在也能正确启动 npm 装的 `claude.cmd`。
 - **0.4.1** — 默认英文界面（中文 locale 或 `ALR_LANG=zh` 时显示中文）；README 加截图。
 - **0.4.0** — 首个公开版本：开源核心与 Pro 拆分，发布到 npm（包名 `agent-limit-retry`）。

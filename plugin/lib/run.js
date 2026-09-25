@@ -82,6 +82,11 @@ export async function run({ prompt, extraArgs = [], maxResumes, cwd = process.cw
     const hit = detectLimit(res, startedAt);
     if (!hit) {
       appendEvent({ type: "run_finished", session: sessionId, cwd, attempts: attempt + 1, ok: res.code === 0 });
+      if (res.code !== 0) {
+        // Not a limit: show what Claude Code said, otherwise a failed run is a blank exit code.
+        const said = (typeof res.result?.result === "string" ? res.result.result : res.raw || "").trim().slice(0, 400);
+        log(t(`[agent-limit-retry] claude exited with code ${res.code}${said ? `: ${said}` : " and no output"}`, `[agent-limit-retry] claude 退出码 ${res.code}${said ? `：${said}` : "，没有任何输出"}`));
+      }
       if (res.result?.result && !quiet) process.stdout.write(res.result.result + "\n");
       return res.code ?? 1;
     }

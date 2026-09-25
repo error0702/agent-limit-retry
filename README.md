@@ -111,6 +111,7 @@ already have.
 
 ## Changelog
 
+- **0.4.3** — Failed `alr run` / `alr selftest` now print what Claude Code said (e.g. "not logged in") instead of a bare exit code; the self-test says it covers Claude Code only.
 - **0.4.2** — Windows: `alr selftest` / `alr report` built a broken `/C:/...` path, so the self-test could not start Claude Code with the plugin; `alr run` and `alr init` now also start the npm `claude.cmd` shim correctly.
 - **0.4.1** — English by default (Chinese with a `zh*` locale or `ALR_LANG=zh`); README screenshot.
 - **0.4.0** — First public release: open core split from Pro, published to npm as `agent-limit-retry`.

@@ -15,7 +15,7 @@ export async function selftest() {
   const ok = (m) => console.log(`  ✓ ${m}`);
   const bad = (m) => { console.log(`  ✗ ${m}`); failed = true; };
   let failed = false;
-  console.log(t("Self-test: simulating a 5-hour limit hit that resets in 10 s (local mock API, spends no quota)...", "自检：模拟一次“5 小时额度用完、10 秒后重置”（本地假接口，不消耗额度）…"));
+  console.log(t("Self-test (Claude Code): simulating a 5-hour limit hit that resets in 10 s (local mock API, spends no quota)...", "自检（Claude Code）：模拟一次“5 小时额度用完、10 秒后重置”（本地假接口，不消耗额度）…"));
 
   const api = await startMockApi({ resetIn: 10 });
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "alr-selftest-"));
@@ -38,7 +38,9 @@ export async function selftest() {
   const events = fs.existsSync(path.join(home, "events.jsonl"))
     ? fs.readFileSync(path.join(home, "events.jsonl"), "utf8").trim().split("\n").map(JSON.parse) : [];
   const waited = events.find((e) => e.type === "run_waiting");
-  if (api.calls.length) ok(t("Claude Code started", "Claude Code 启动正常")); else bad(t("Claude Code made no requests (are you logged in? run claude to check)", "Claude Code 没发出请求（是否已登录？运行 claude 检查一下）"));
+  if (api.calls.length) ok(t("Claude Code started", "Claude Code 启动正常"));
+  else bad(t("Claude Code made no requests. Usually it is not logged in: run `claude -p hi` in a terminal and see what it says (this self-test is for Claude Code only; Codex users run `alr codex-check` instead)",
+             "Claude Code 没发出请求。通常是没登录：在终端跑一下 `claude -p hi` 看它说什么（这个自检只测 Claude Code；用 Codex 的请跑 `alr codex-check`）"));
   if (events.some((e) => e.type === "debug_hook")) ok(t("Plugin hooks loaded", "插件 hooks 加载正常")); else bad(t("Plugin hooks did not run", "插件 hooks 没有运行"));
   const resetClock = waited && new Date(waited.resetsAt * 1000).toLocaleTimeString(zh ? "zh-CN" : "en-US");
   if (waited) ok(t(`Limit hit detected, reset time ${resetClock}`, `识别到额度用完，拿到重置时间 ${resetClock}`)); else bad(t("Limit hit not detected", "没识别到额度用完"));
