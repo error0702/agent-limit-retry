@@ -8,7 +8,7 @@
       "name": "agent-limit-retry",
       "source": "./plugin",
       "description": "Hand off before a usage limit hits, and pick up again after it resets.",
-      "version": "0.4.1"
+      "version": "0.4.2"
     }
   ],
   "metadata": {

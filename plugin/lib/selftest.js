@@ -4,11 +4,12 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { startMockApi } from "./mockapi.js";
 import { claudeDir, readJSON } from "./paths.js";
 import { t, zh } from "./i18n.js";
 
-const pluginDir = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+const pluginDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 export async function selftest() {
   const ok = (m) => console.log(`  ✓ ${m}`);

@@ -2,7 +2,7 @@
 // Claude Code's own auto-continue only covers interactive sessions and resets < 24h away;
 // this covers `-p` runs, background jobs, and weekly limits.
 import { spawn } from "node:child_process";
-import { appendEvent, config } from "./paths.js";
+import { appendEvent, config, claudeLauncher } from "./paths.js";
 import { findTranscript, lastLimitHit, parseResetText } from "./claude.js";
 import { RESUME_PROMPT } from "./handoff.js";
 import { notify } from "./notify.js";
@@ -14,9 +14,10 @@ const now = () => Math.floor(Date.now() / 1000);
 const fmt = (at) => new Date(at * 1000).toLocaleString(zh ? "zh-CN" : "en-US", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 function runClaude(args, log) {
-  const bin = process.env.ALR_CLAUDE_BIN || "claude";
+  const launcher = claudeLauncher();
+  const bin = launcher.cmd;
   return new Promise((resolve) => {
-    const child = spawn(bin, args, { stdio: ["ignore", "pipe", "inherit"] });
+    const child = spawn(bin, [...launcher.args, ...args], { stdio: ["ignore", "pipe", "inherit"], shell: !!launcher.shell, windowsHide: true });
     let out = "";
     child.stdout.on("data", (d) => { out += d; });
     child.on("error", (e) => { log(t(`Cannot start ${bin}: ${e.message}`, `无法启动 ${bin}: ${e.message}`)); resolve({ code: 127, result: null }); });

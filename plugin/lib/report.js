@@ -8,6 +8,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { claudeDir, config, file, readJSON } from "./paths.js";
 import { findTranscript, recentLimitHits } from "./claude.js";
@@ -96,7 +97,7 @@ function subagents(pro, transcript, from, to, firstHit) {
 
 export async function report(outDir) {
   const pro = await loadPro();
-  const pkg = readJSON(new URL("../../package.json", import.meta.url).pathname, {});
+  const pkg = readJSON(fileURLToPath(new URL("../../package.json", import.meta.url)), {});
   const events = readLines(file("events.jsonl")).map((e) => ({ ...e, cwd: e.cwd ? `proj-${hash(e.cwd)}` : undefined }));
   const sessionIds = [...new Set(events.filter((e) => e.session && /limit_hit|resume_noted|run_/.test(e.type)).map((e) => e.session))];
   // Sessions that hit a limit since the plugin was installed (even if it never fired - that's a

@@ -7,7 +7,7 @@ import path from "node:path";
 import readline from "node:readline/promises";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { claudeDir, config, file, home, readJSON, writeJSON } from "./paths.js";
+import { claudeDir, config, file, home, readJSON, writeJSON, claudeLauncher } from "./paths.js";
 import * as zcode from "./zcode.js";
 import * as codexlib from "./codex.js";
 import { t } from "./i18n.js";
@@ -30,7 +30,8 @@ async function confirm(q, yes) {
 }
 
 const claudeCmd = (args) => {
-  const r = spawnSync("claude", args, { encoding: "utf8" });
+  const l = claudeLauncher();
+  const r = spawnSync(l.cmd, [...l.args, ...args], { encoding: "utf8", shell: !!l.shell, windowsHide: true });
   return { ok: r.status === 0, out: `${r.stdout || ""}${r.stderr || ""}`.trim() };
 };
 

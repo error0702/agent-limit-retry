@@ -1,6 +1,6 @@
 {
   "name": "agent-limit-retry",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Hand off before a usage limit hits, and pick up again after it resets.",
   "license": "MIT",
   "author": {

@@ -27,3 +27,23 @@ export function appendEvent(event) {
 }
 
 export const config = () => ({ threshold: 90, maxResumes: 5, notify: true, ...readJSON(file("config.json"), {}) });
+
+/** How to start Claude Code on this machine. On Windows the npm install leaves a `claude.cmd`
+ *  shim, which child_process can't start without a shell; run its cli.js with node instead.
+ *  Returns { cmd, args } to prepend to the real arguments. */
+export function claudeLauncher() {
+  const override = process.env.ALR_CLAUDE_BIN;
+  if (override) return { cmd: override, args: [] };
+  if (process.platform !== "win32") return { cmd: "claude", args: [] };
+  const dirs = (process.env.PATH || "").split(path.delimiter).filter(Boolean);
+  for (const d of dirs) {
+    for (const ext of [".exe", ".com"]) { const p = path.join(d, `claude${ext}`); if (fs.existsSync(p)) return { cmd: p, args: [] }; }
+    const cmd = path.join(d, "claude.cmd");
+    if (fs.existsSync(cmd)) {
+      const cli = path.join(d, "node_modules", "@anthropic-ai", "claude-code", "cli.js");
+      if (fs.existsSync(cli)) return { cmd: process.execPath, args: [cli] };
+      return { cmd, args: [], shell: true };
+    }
+  }
+  return { cmd: "claude", args: [] };
+}

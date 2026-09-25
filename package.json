@@ -1,6 +1,6 @@
 {
   "name": "agent-limit-retry",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Keep AI coding agents working through usage limits: hand off before the limit, resume after the reset.",
   "type": "module",
   "bin": {

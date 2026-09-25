@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
-export const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /** Fresh ALR_HOME + CLAUDE_CONFIG_DIR + project dir for one test. */
 export function sandbox() {
